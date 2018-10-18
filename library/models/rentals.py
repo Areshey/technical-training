@@ -9,3 +9,12 @@ class Rentals(models.Model):
     book_id = fields.Many2one('library.book', string='Book')
     rental_date = fields.Date(string='Rental date')
     return_date = fields.Date(string='Return date')
+
+    #nickname = fields.Char(related='partner.name', store=True)
+    isbn = fields.Char(related='book_id.isbn')
+    publisher_name=fields.Char(related="book_id.publisher_id.name",string="publisher Name")
+    
+    address = fields.Text(related='customer_id.address')
+    
+    
+    
