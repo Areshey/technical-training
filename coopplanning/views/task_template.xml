@@ -3,13 +3,14 @@
         <field name="name">Task Template List</field>
         <field name="model">coopplanning.task.template</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree  default_order="day_nb_id,start_time">
                 <field name="task_type_id" />
                 <field name="name" />
                 <field name="day_nb_id" />
-                <field name="start_time" />
-                <field name="end_time" />
-                <field name="duration" />
+                
+                <field name="start_time" widget="float_time" />
+                <field name="end_time" widget="float_time"/>
+                <field name="duration" widget="float_time"/>
                 <field name="worker_nb" />
             </tree>
         </field>
