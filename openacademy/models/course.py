@@ -115,3 +115,46 @@ class Session(models.Model):
                 start_date = fields.Datetime.from_string(session.start_date)
                 end_date = fields.Datetime.from_string(session.end_date)
                 session.duration = (end_date - start_date).days + 1
+
+    @api.multi                
+    def action_draft():
+        for rec in self:
+            rec.state="draft"
+            rec.message_post(body="Session %s of the course %s reset to draft" % (rec.name, rec.course_id.name))
+
+
+    @api.multi                
+    def action_comfirm(self):
+        for rec in self:
+            rec.state="confirmed"
+            rec.message_post(body="Session %s of the course %s confirmed" % (rec.name, rec.course_id.name))
+
+    @api.multi            
+    def action_done(self):
+        for rec in self:
+            rec.state="done"
+            rec.message_post(body="Session %s of the course %s done" % (rec.name, rec.course_id.name))
+
+    @api.multi                
+    def _auto_transition(self):
+        for rec in self:
+            if rec.taken_seats >=50.0 and rec.state=='draft':
+                rec.action_comfirm()
+                
+                
+    @api.multi
+    def write(self, vals):
+        res = super(Session, self).write(vals)
+        for rec in self:
+            rec._auto_transition()
+        if vals.get('instructor_id'):
+            self.message_subscribe([vals['instructor_id']])
+        return res
+  
+    @api.model
+    def create(self, vals):
+        res = super(Session, self).create(vals)
+        res._auto_transition()
+        if vals.get('instructor_id'):
+            res.message_subscribe([vals['instructor_id']])
+        return res
